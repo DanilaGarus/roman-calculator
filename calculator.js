@@ -1,5 +1,5 @@
 const RomanNumsRegex = new RegExp('^M{0,3}(CM|CD|D?C{0,3})?(XC|XL|L?X{0,3})?(IX|IV|V?I{0,3})?$')
-const separators = ['+', '-', '/', '*', '%'];
+const operands = ['+', '-', '/', '*','%'];
 
 function calculator(string) {
     let intRes;
@@ -7,13 +7,13 @@ function calculator(string) {
     //Проверка на одиночные символы, пустые строки и выражение в котором кол-во операндов > 1
     if (string.length < 5 || string.match(/\s{2}/) || string.match(/\w [+*/-] \w [+*/-]/)) throw Error('Invalid input')
 
-    for (let separator of separators) {
-        if (string.includes(separator)) {
-            let number = string.split(` ${separator} `);
+    for (let operand of operands) {
+        if (string.includes(operand)) {
+            let number = string.split(` ${operand} `);
 
             // Проверка на range чисел ( по условию от 1-10 включительно) и наличие основных невалидных операндов
             for (let i = 0; i < number.length; i++) {
-                if (number[i] >= 11 || number[i] <= 0 || separator.match(/[:;#@!_=%'"><&]/))
+                if (number[i] >= 11 || number[i] <= 0 || operand.match(/[%:;#@!_='"><&]/))
                     throw Error('Invalid input')
             }
 
@@ -31,7 +31,7 @@ function calculator(string) {
     }
 }
 
-const RomanToDecimal = (romanNumber) => {
+function RomanToDecimal(romanNumber) {
     const RomanToInt = (rom) => {
         const legend = "IVXLCDM";
         const l = [1, 5, 10, 50, 100, 500, 1000];
@@ -57,25 +57,25 @@ function DecimalToRoman(number) {
 
     let result = "";
 
-    for (let roman of Object.keys(romans)) {
-        let repeat = Math.floor(number / romans[roman]);
-        number -= repeat * romans[roman];
-        result += roman.repeat(repeat);
+    for (let romanKey of Object.keys(romans)) {
+        let repeat = Math.floor(number / romans[romanKey]);
+        number -= repeat * romans[romanKey];
+        result += romanKey.repeat(repeat);
     }
     return result;
 }
 
 function romanNumbersCalculations(string) {
-    for (let separator of separators) {
-        if (string.includes(separator)) {
-            let numbers = string.split(` ${separator} `);
+    for (let operand of operands) {
+        if (string.includes(operand)) {
+            let nums = string.split(` ${operand} `);
 
-            let firstNumber = RomanToDecimal(numbers[0]);
-            let secondNumber = RomanToDecimal(numbers[1]);
+            let firstNumber = RomanToDecimal(nums[0]);
+            let secondNumber = RomanToDecimal(nums[1]);
 
             if (firstNumber > 10 || secondNumber > 10) throw Error('Invalid input')
 
-            let res = (eval(`${firstNumber} ${separator} ${secondNumber}`))
+            let res = (eval(`${firstNumber} ${operand} ${secondNumber}`))
 
             if (res % 1 !== 0) res = Math.floor(res);
 
