@@ -11,13 +11,13 @@ function calculator(string) {
         if (string.includes(separator)) {
             let number = string.split(` ${separator} `);
 
-            // Проверка на range чисел ( по условию от 1-10 включительно) и наличие невалидных операндов
+            // Проверка на range чисел ( по условию от 1-10 включительно) и наличие основных невалидных операндов
             for (let i = 0; i < number.length; i++) {
                 if (number[i] >= 11 || number[i] <= 0 || separator.match(/[:;#@!_=%'"><&]/))
                     throw Error('Invalid input')
             }
 
-            if (number[0].match(RomanNumsRegex) && number[1].match(RomanNumsRegex)) return romanNumberCalculations(string)
+            if (number[0].match(RomanNumsRegex) && number[1].match(RomanNumsRegex)) return romanNumbersCalculations(string)
             else {
                 try {
                     intRes = eval(string);
@@ -32,17 +32,17 @@ function calculator(string) {
 }
 
 const RomanToDecimal = (romanNumber) => {
-    const RomanToInt = (s) => {
+    const RomanToInt = (rom) => {
         const legend = "IVXLCDM";
         const l = [1, 5, 10, 50, 100, 500, 1000];
         let sum = 0;
-        while (s) {
-            if (s[1] && legend.indexOf(s[0]) < legend.indexOf(s[1])) {
-                sum += l[legend.indexOf(s[1])] - l[legend.indexOf(s[0])];
-                s = s.substring(2, s.length);
+        while (rom) {
+            if (rom[1] && legend.indexOf(rom[0]) < legend.indexOf(rom[1])) {
+                sum += l[legend.indexOf(rom[1])] - l[legend.indexOf(rom[0])];
+                rom = rom.substring(2, rom.length);
             } else {
-                sum += l[legend.indexOf(s[0])];
-                s = s.substring(1, s.length);
+                sum += l[legend.indexOf(rom[0])];
+                rom = rom.substring(1, rom.length);
             }
         }
         return sum;
@@ -51,27 +51,27 @@ const RomanToDecimal = (romanNumber) => {
 }
 
 function DecimalToRoman(number) {
-    let roman = {
+    let romans = {
         "C": 100, "XC": 90, "L": 50, "XL": 40, "X": 10, "IX": 9, "V": 5, "IV": 4, "I": 1
     };
 
     let result = "";
 
-    for (let i of Object.keys(roman)) {
-        let repeat = Math.floor(number / roman[i]);
-        number -= repeat * roman[i];
-        result += i.repeat(repeat);
+    for (let roman of Object.keys(romans)) {
+        let repeat = Math.floor(number / romans[roman]);
+        number -= repeat * romans[roman];
+        result += roman.repeat(repeat);
     }
     return result;
 }
 
-function romanNumberCalculations(string) {
+function romanNumbersCalculations(string) {
     for (let separator of separators) {
         if (string.includes(separator)) {
-            let values = string.split(` ${separator} `);
+            let numbers = string.split(` ${separator} `);
 
-            let firstNumber = RomanToDecimal(values[0]);
-            let secondNumber = RomanToDecimal(values[1]);
+            let firstNumber = RomanToDecimal(numbers[0]);
+            let secondNumber = RomanToDecimal(numbers[1]);
 
             if (firstNumber > 10 || secondNumber > 10) throw Error('Invalid input')
 
