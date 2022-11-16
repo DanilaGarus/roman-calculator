@@ -4,7 +4,7 @@ const operands = ['+', '-', '/', '*','%'];
 function calculator(string) {
     let intRes;
 
-    //Проверка на одиночные символы, пустые строки и выражение в котором кол-во операндов > 1
+    //Проверка на одиночные символы, пустые строки и выражение, в котором кол-во операндов > 1
     if (string.length < 5 || string.match(/\s{2}/) || string.match(/\w [+*/-] \w [+*/-]/)) throw Error('Invalid input')
 
     for (let operand of operands) {
@@ -17,9 +17,11 @@ function calculator(string) {
                     throw Error('Invalid input')
             }
 
+            // Проверка на то, с какими числами надо работать
             if (number[0].match(RomanNumsRegex) && number[1].match(RomanNumsRegex)) return romanNumbersCalculations(string)
             else {
                 try {
+                    //Выполнение операций над арабскими числами
                     intRes = eval(string);
                     if (intRes % 1 !== 1) return Math.floor(intRes).toString();
                     else return intRes.toString();
@@ -31,40 +33,7 @@ function calculator(string) {
     }
 }
 
-function RomanToDecimal(romanNumber) {
-    const RomanToInt = (rom) => {
-        const legend = "IVXLCDM";
-        const l = [1, 5, 10, 50, 100, 500, 1000];
-        let sum = 0;
-        while (rom) {
-            if (rom[1] && legend.indexOf(rom[0]) < legend.indexOf(rom[1])) {
-                sum += l[legend.indexOf(rom[1])] - l[legend.indexOf(rom[0])];
-                rom = rom.substring(2, rom.length);
-            } else {
-                sum += l[legend.indexOf(rom[0])];
-                rom = rom.substring(1, rom.length);
-            }
-        }
-        return sum;
-    };
-    return RomanToInt(romanNumber.toUpperCase()).toString();
-}
-
-function DecimalToRoman(number) {
-    let romans = {
-        "C": 100, "XC": 90, "L": 50, "XL": 40, "X": 10, "IX": 9, "V": 5, "IV": 4, "I": 1
-    };
-
-    let result = "";
-
-    for (let romanKey of Object.keys(romans)) {
-        let repeat = Math.floor(number / romans[romanKey]);
-        number -= repeat * romans[romanKey];
-        result += romanKey.repeat(repeat);
-    }
-    return result;
-}
-
+//Выполнение операций над римскими числами
 function romanNumbersCalculations(string) {
     for (let operand of operands) {
         if (string.includes(operand)) {
@@ -84,6 +53,42 @@ function romanNumbersCalculations(string) {
             return DecimalToRoman(res.toString());
         }
     }
+}
+
+//Работает путём помещения цифр перед или после основных чисел. 6 = V + I и т.д.
+function RomanToDecimal(romanNumber) {
+    const RomanToInt = (rom) => {
+        const legend = "IVXLCDM";
+        const l = [1, 5, 10, 50, 100, 500, 1000];
+        let sum = 0;
+        while (rom) {
+            if (rom[1] && legend.indexOf(rom[0]) < legend.indexOf(rom[1])) {
+                sum += l[legend.indexOf(rom[1])] - l[legend.indexOf(rom[0])];
+                rom = rom.substring(2, rom.length);
+            } else {
+                sum += l[legend.indexOf(rom[0])];
+                rom = rom.substring(1, rom.length);
+            }
+        }
+        return sum;
+    };
+    return RomanToInt(romanNumber.toUpperCase()).toString();
+}
+/*Работает на основе хешированных данных. Проверяет соответствует ли парснутое число значению римского числа
+ если нет - сооздаёт римское число*/
+function DecimalToRoman(number) {
+    let romans = {
+        "C": 100, "XC": 90, "L": 50, "XL": 40, "X": 10, "IX": 9, "V": 5, "IV": 4, "I": 1
+    };
+
+    let result = "";
+
+    for (let romanKey of Object.keys(romans)) {
+        let repeat = Math.floor(number / romans[romanKey]);
+        number -= repeat * romans[romanKey];
+        result += romanKey.repeat(repeat);
+    }
+    return result;
 }
 
 module.exports = calculator;
