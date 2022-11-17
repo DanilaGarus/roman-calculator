@@ -1,52 +1,29 @@
-const operands = ['+', '-', '/', '*'];
-const rom = ['I','V','X']
+const rom = ['I', 'V', 'X']
+const validInput = /^[0-9]{1,2}\s[+*/-]\s+[0-9]{1,2}$|^[IVX]{1,4}\s[+*/-]\s+[IVX]{1,4}$/
 
 function calculator(string) {
-    let intRes;
-    const matchingOperands = string.split('').filter(x => operands.includes(x))
-    const matchingRomanNumbers = string.split('').filter(x => rom.includes(x))
+    if (!string.match(validInput)) throw Error('Invalid input');
 
-    let firstNumber = parseInt(string);
-    let secondNumber = parseInt(string.split("").reverse().join(""))
+    const isRomanNumber = string.split('').some(x => rom.includes(x));
 
-    if(matchingOperands.length === 0) throw Error('Invalid input')
+    const numbers = string.split(' ');
 
-    if(firstNumber <= 0 || firstNumber >= 11 || secondNumber <= 0 || secondNumber >= 11) throw Error('Invalid input')
+    const firstNumber = isRomanNumber ? RomanToDecimal(numbers[0]) : parseInt(numbers[0]);
+    const secondNumber = isRomanNumber ? RomanToDecimal(numbers[2]) : parseInt(numbers[2]);
+    const separator = numbers[1];
 
-    if (string.length < 5 || string.match(/\s{2}/) || string.match(/\w [+*/-] \w [+*/-]/)) throw Error('Invalid input')
-
-    if (matchingRomanNumbers && matchingRomanNumbers.length > 1) return romanNumbersCalculations(string)
+    if (firstNumber <= 0 || firstNumber >= 11 || secondNumber <= 0 || secondNumber >= 11) throw Error('Invalid input');
 
     try {
-        intRes = eval(string);
-        if (intRes % 1 !== 1) return Math.floor(intRes).toString();
-        else return intRes.toString();
-    } catch {
-        throw Error('Invalid input')
-    }
-}
-
-//Выполнение операций над римскими числами
-function romanNumbersCalculations(string) {
-    for (let operand of operands) {
-        if (string.includes(operand)) {
-            let nums = string.split(` ${operand} `);
-
-            let firstNumber = RomanToDecimal(nums[0]);
-            let secondNumber = RomanToDecimal(nums[1]);
-
-            if (firstNumber > 10 || secondNumber > 10) throw Error('Invalid input')
-
-            let res = (eval(`${firstNumber}
-            ${operand}
-            ${secondNumber}`))
-
-            if (res % 1 !== 0) res = Math.floor(res);
-
-            if (res <= 0) return "";
-
-            return DecimalToRoman(res.toString());
+        let result = eval(`${firstNumber} ${separator} ${secondNumber}`);
+        if(result < 1 && isRomanNumber) return '';
+        if (result % 1 !== 1) {
+            result = Math.floor(result).toString();
         }
+
+        return isRomanNumber ? DecimalToRoman(result) : result;
+    } catch {
+        throw Error('Invalid input');
     }
 }
 
@@ -54,7 +31,7 @@ function romanNumbersCalculations(string) {
 function RomanToDecimal(romanNumber) {
     const RomanToInt = (rom) => {
         const legend = "IVXLCDM";
-        const l = [1, 5, 10, 50, 100, 500, 1000];
+        const l = [1, 5, 10, 50, 100];
         let sum = 0;
         while (rom) {
             if (rom[1] && legend.indexOf(rom[0]) < legend.indexOf(rom[1])) {
