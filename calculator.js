@@ -1,35 +1,28 @@
-const RomanNumsRegex = new RegExp('^M{0,3}(CM|CD|D?C{0,3})?(XC|XL|L?X{0,3})?(IX|IV|V?I{0,3})?$')
-const operands = ['+', '-', '/', '*','%'];
+const operands = ['+', '-', '/', '*'];
+const rom = ['I','V','X']
 
 function calculator(string) {
     let intRes;
+    const matchingOperands = string.split('').filter(x => operands.includes(x))
+    const matchingRomanNumbers = string.split('').filter(x => rom.includes(x))
 
-    //Проверка на одиночные символы, пустые строки и выражение, в котором кол-во операндов > 1
+    let firstNumber = parseInt(string);
+    let secondNumber = parseInt(string.split("").reverse().join(""))
+
+    if(matchingOperands.length === 0) throw Error('Invalid input')
+
+    if(firstNumber <= 0 || firstNumber >= 11 || secondNumber <= 0 || secondNumber >= 11) throw Error('Invalid input')
+
     if (string.length < 5 || string.match(/\s{2}/) || string.match(/\w [+*/-] \w [+*/-]/)) throw Error('Invalid input')
 
-    for (let operand of operands) {
-        if (string.includes(operand)) {
-            let number = string.split(` ${operand} `);
+    if (matchingRomanNumbers && matchingRomanNumbers.length > 1) return romanNumbersCalculations(string)
 
-            // Проверка на range чисел ( по условию от 1-10 включительно) и наличие основных невалидных операндов
-            for (let i = 0; i < number.length; i++) {
-                if (number[i] >= 11 || number[i] <= 0 || operand.match(/[%:;#@!_='"><&]/))
-                    throw Error('Invalid input')
-            }
-
-            // Проверка на то, с какими числами надо работать
-            if (number[0].match(RomanNumsRegex) && number[1].match(RomanNumsRegex)) return romanNumbersCalculations(string)
-            else {
-                try {
-                    //Выполнение операций над арабскими числами
-                    intRes = eval(string);
-                    if (intRes % 1 !== 1) return Math.floor(intRes).toString();
-                    else return intRes.toString();
-                } catch {
-                    throw Error('Invalid input')
-                }
-            }
-        }
+    try {
+        intRes = eval(string);
+        if (intRes % 1 !== 1) return Math.floor(intRes).toString();
+        else return intRes.toString();
+    } catch {
+        throw Error('Invalid input')
     }
 }
 
@@ -44,7 +37,9 @@ function romanNumbersCalculations(string) {
 
             if (firstNumber > 10 || secondNumber > 10) throw Error('Invalid input')
 
-            let res = (eval(`${firstNumber} ${operand} ${secondNumber}`))
+            let res = (eval(`${firstNumber}
+            ${operand}
+            ${secondNumber}`))
 
             if (res % 1 !== 0) res = Math.floor(res);
 
@@ -74,6 +69,7 @@ function RomanToDecimal(romanNumber) {
     };
     return RomanToInt(romanNumber.toUpperCase()).toString();
 }
+
 /*Работает на основе хешированных данных. Проверяет соответствует ли парснутое число значению римского числа
  если нет - сооздаёт римское число*/
 function DecimalToRoman(number) {
